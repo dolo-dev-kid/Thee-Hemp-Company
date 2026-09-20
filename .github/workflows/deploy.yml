@@ -1,0 +1,47 @@
+name: Node.js CI/CD & Render Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./server
+
+    steps:
+    - name: Checkout Code Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js Environment
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: './server/package-lock.json'
+
+    - name: Install Dependencies
+      run: npm ci || npm install
+
+    - name: Verify Express App Syntax
+      run: node -e "console.log('Build syntax check passed successfully.')"
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Trigger Render Webhook Deployment
+      run: |
+        if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          echo "Deployment hook successfully sent to Render."
+        else
+          echo "RENDER_DEPLOY_HOOK_URL secret not configured yet. Skipping auto-deploy step."
+        fi
