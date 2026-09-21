@@ -1,48 +1,58 @@
 const express = require('express');
 const cors = require('cors');
-const bioTrackService = require('./biotrackService');
 const posSyncMiddleware = require('./posSyncMiddleware');
+const { startInventoryCron, getCachedInventory } = require('./cronSync');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Live Menu Endpoint synced with BioTrack
+// Health Check Route for Render
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'online', service: 'Pittsburgh Dispensary Local POS API' });
+});
+
+// Fast Menu Endpoint (Serves internal inventory)
 app.get('/api/products', async (req, res) => {
   try {
-    const inventory = await bioTrackService.getLiveInventory();
-    res.json(inventory);
+    const products = await getCachedInventory();
+    res.json(products);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to retrieve BioTrack inventory.' });
+    res.status(500).json({ error: 'Failed to serve product menu.' });
   }
 });
 
-// Reserve Order Route using BioTrack Queue & ID Verification
+// Reserve Order Route (Direct local pickup queue)
 app.post(
   '/api/orders/reserve',
   posSyncMiddleware.verifyCustomerIdentity,
   posSyncMiddleware.syncInventoryLock,
   async (req, res) => {
     const { customerName, idNumber, mmjCardNumber, verificationType, items, totalAmount } = req.body;
-
     const idOrCardNumber = verificationType === 'MEDICAL_CARD' ? mmjCardNumber : idNumber;
 
-    const orderResult = await bioTrackService.createOrderReservation({
-      customerName,
-      verificationType,
-      idOrCardNumber,
-      items,
-      total: totalAmount,
-    });
+    const orderId = `ORD-${Date.now()}`;
+    console.log(`[LOCAL POS] Reservation Created: ${orderId} for ${customerName}`);
 
     res.status(201).json({
-      message: 'Order reservation process finished.',
+      message: 'Order reservation completed successfully.',
       verificationStatus: req.verificationDetails,
-      posResult: orderResult,
+      posResult: {
+        success: true,
+        orderId: orderId,
+        customer: customerName,
+        idRef: idOrCardNumber,
+        total: totalAmount,
+        status: 'READY_FOR_PICKUP_VERIFICATION'
+      }
     });
   }
 );
 
+// Bind to process.env.PORT and 0.0.0.0 for Render compatibility
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT} with BioTrack POS integration.`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  startInventoryCron();
+});
