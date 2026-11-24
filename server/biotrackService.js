@@ -17,7 +17,7 @@ class BioTrackService {
         username: this.username,
         password: this.password,
         license: this.licenseNumber,
-      });
+      }, { timeout: 5000 });
 
       if (response.data && response.data.sessionid) {
         this.sessionToken = response.data.sessionid;
@@ -40,7 +40,7 @@ class BioTrackService {
       const response = await axios.post(`${this.baseUrl}/inventory/get`, {
         sessionid: this.sessionToken,
         active_only: 1, // Exclude depleted inventory
-      });
+      }, { timeout: 5000 });
 
       // BioTrack uses 16-digit unique identifiers per batch/lot
       const products = (response.data.inventory || [])
