@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thee Hemp Company — Pittsburgh Dispensary | Menu &amp; Pickup Reservations</title>
+<meta name="description" content="Pittsburgh Dispensary pickup reservations. Browse the live menu, reserve for pickup, show your 21+ ID or PA medical card in store.">
+<style>
+  :root { --bg:#0d0f0c; --panel:#171a15; --panel2:#1f241d; --gold:#d4af37; --gold-dim:#a8862a; --green:#4caf6d; --text:#f2f0e8; --muted:#a9a89a; --line:#2c312a; --red:#e06c5a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.5; }
+  a { color:var(--gold); }
+  .wrap { max-width:960px; margin:0 auto; padding:0 16px 120px; }
+  header { padding:28px 0 8px; text-align:center; }
+  header .mark { font-size:13px; letter-spacing:.35em; color:var(--gold); text-transform:uppercase; }
+  header h1 { font-size:32px; line-height:1.1; margin:8px 0 4px; }
+  header p { color:var(--muted); font-size:15px; }
+  .badges { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:14px 0 4px; }
+  .badge { border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-size:12.5px; color:var(--muted); }
+  .badge b { color:var(--gold); font-weight:600; }
+  .filters { display:flex; gap:8px; flex-wrap:wrap; margin:22px 0 14px; }
+  .chip { border:1px solid var(--line); background:var(--panel); color:var(--text); border-radius:999px; padding:8px 14px; font-size:14px; cursor:pointer; }
+  .chip.active { background:var(--gold); color:#141414; border-color:var(--gold); font-weight:700; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:8px; }
+  .card .cat { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
+  .card h3 { font-size:18px; line-height:1.25; }
+  .card .meta { color:var(--muted); font-size:14px; }
+  .card .row { display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:8px; }
+  .price { font-size:20px; font-weight:700; }
+  .low { color:var(--red); font-size:13px; }
+  .qty { display:flex; align-items:center; gap:10px; }
+  .qty button { width:34px; height:34px; border-radius:50%; border:1px solid var(--gold); background:transparent; color:var(--gold); font-size:18px; cursor:pointer; }
+  .qty button:disabled { opacity:.35; cursor:default; }
+  .add { width:100%; background:var(--gold); color:#141414; border:0; border-radius:10px; padding:11px; font-size:15px; font-weight:700; cursor:pointer; }
+  .add.added { background:var(--green); color:#fff; }
+  #status { text-align:center; color:var(--muted); padding:40px 0; }
+  .cartbar { position:fixed; left:0; right:0; bottom:0; background:var(--panel2); border-top:1px solid var(--line); padding:12px 16px calc(12px + env(safe-area-inset-bottom)); display:flex; justify-content:space-between; align-items:center; gap:12px; z-index:20; }
+  .cartbar .info { font-size:14px; color:var(--muted); }
+  .cartbar .info b { color:var(--text); font-size:16px; }
+  .cartbar button { background:var(--gold); color:#141414; border:0; border-radius:10px; padding:12px 18px; font-size:15px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .cartbar button:disabled { opacity:.4; cursor:default; }
+  .sheet { position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; z-index:30; align-items:flex-end; justify-content:center; }
+  .sheet.open { display:flex; }
+  .panel { background:var(--panel); border-radius:18px 18px 0 0; width:100%; max-width:640px; max-height:88vh; overflow:auto; padding:22px 18px calc(22px + env(safe-area-inset-bottom)); }
+  .panel h2 { font-size:22px; margin-bottom:4px; }
+  .panel .sub { color:var(--muted); font-size:14px; margin-bottom:16px; }
+  .line-item { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .line-item .nm { font-size:15px; }
+  .line-item .pr { font-weight:700; white-space:nowrap; }
+  .total { display:flex; justify-content:space-between; font-size:18px; font-weight:700; padding:14px 0; }
+  label { display:block; font-size:14px; color:var(--muted); margin:12px 0 4px; }
+  input, select { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:12px; font-size:16px; }
+  .radio-row { display:flex; gap:10px; }
+  .radio-row label { flex:1; border:1px solid var(--line); border-radius:10px; padding:12px; cursor:pointer; color:var(--text); margin:0; text-align:center; font-size:14px; }
+  .radio-row input { display:none; }
+  .radio-row label.sel { border-color:var(--gold); background:rgba(212,175,55,.12); }
+  .primary { width:100%; background:var(--gold); color:#141414; border:0; border-radius:10px; padding:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:18px; }
+  .ghost { width:100%; background:transparent; color:var(--muted); border:1px solid var(--line); border-radius:10px; padding:12px; font-size:15px; cursor:pointer; margin-top:10px; }
+  .err { color:var(--red); font-size:14px; margin-top:10px; display:none; }
+  .ok { text-align:center; padding:10px 0; }
+  .ok .big { font-size:52px; }
+  .ok h2 { margin:8px 0; }
+  .ok code { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:4px 10px; font-size:17px; color:var(--gold); }
+  footer { text-align:center; color:var(--muted); font-size:13px; padding:28px 0 8px; line-height:1.7; }
+  /* Age gate */
+  #gate { position:fixed; inset:0; background:var(--bg); z-index:50; display:flex; align-items:center; justify-content:center; padding:20px; }
+  #gate .box { max-width:440px; text-align:center; }
+  #gate h2 { font-size:26px; margin:10px 0 8px; }
+  #gate p { color:var(--muted); margin-bottom:20px; }
+  #gate .primary { margin-top:10px; }
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="box">
+    <div class="mark" style="font-size:13px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;">Thee Hemp Company</div>
+    <h2>Are you 21 or older?</h2>
+    <p>This menu is for adults 21+ and Pennsylvania medical marijuana cardholders only. Please confirm to continue.</p>
+    <button class="primary" id="gateYes">Yes — I'm 21+ or a PA cardholder</button>
+    <button class="ghost" id="gateNo">No — take me away</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="mark">Thee Hemp Company</div>
+    <h1>Pittsburgh Dispensary</h1>
+    <p>Browse the live menu. Reserve for pickup — pay in store.</p>
+    <div class="badges">
+      <span class="badge"><b>Pickup only</b> — no delivery</span>
+      <span class="badge"><b>21+</b> ID checked in store</span>
+      <span class="badge"><b>PA medical cards</b> welcome</span>
+    </div>
+  </header>
+
+  <div class="filters" id="filters"></div>
+  <div id="status">Loading the menu…</div>
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    Menu updates live from the shop's system. Availability shown here is what the store has on hand right now.<br>
+    Reservations hold your items for pickup. Bring a valid 21+ government ID or your unexpired PA medical marijuana card —<br>
+    your order is verified in store before pickup. No payment is taken online.
+  </footer>
+</div>
+
+<div class="cartbar" id="cartbar" style="display:none;">
+  <div class="info"><b id="cartCount">0 items</b><br><span id="cartTotal">$0.00</span></div>
+  <button id="reviewBtn">Review &amp; reserve</button>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="panel" id="sheetPanel"></div>
+</div>
+
+<script>
+const API = '';
+let products = [];
+let cart = {}; // id -> qty
+let activeCat = 'All';
+
+const $ = s => document.querySelector(s);
+const money = n => '$' + n.toFixed(2);
+
+// Age gate
+if (localStorage.getItem('hemp-age-ok') === '1') document.getElementById('gate').style.display = 'none';
+document.getElementById('gateYes').onclick = () => { localStorage.setItem('hemp-age-ok','1'); document.getElementById('gate').style.display = 'none'; };
+document.getElementById('gateNo').onclick = () => { document.querySelector('#gate p').textContent = 'Sorry — you must be 21 or older, or a PA medical marijuana cardholder, to view this menu.'; document.getElementById('gateYes').style.display = 'none'; document.getElementById('gateNo').style.display = 'none'; };
+
+// Load menu live from the shop API so prices always match the store
+async function loadMenu() {
+  try {
+    const res = await fetch(API + '/api/products');
+    if (!res.ok) throw new Error('menu unavailable');
+    products = await res.json();
+    renderFilters();
+    renderGrid();
+    document.getElementById('status').style.display = 'none';
+  } catch (e) {
+    document.getElementById('status').textContent = 'The menu could not be loaded right now. Please refresh or try again shortly.';
+  }
+}
+
+function renderFilters() {
+  const cats = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
+  document.getElementById('filters').innerHTML = cats.map(c =>
+    `<button class="chip ${c === activeCat ? 'active' : ''}" data-cat="${c}">${c}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(b => b.onclick = () => { activeCat = b.dataset.cat; renderFilters(); renderGrid(); });
+}
+
+function renderGrid() {
+  const list = products.filter(p => activeCat === 'All' || p.category === activeCat);
+  document.getElementById('grid').innerHTML = list.map(p => {
+    const q = cart[p.id] || 0;
+    const low = p.quantityAvailable <= 5;
+    return `<div class="card">
+      <div class="cat">${p.category || 'Menu'}</div>
+      <h3>${p.name}</h3>
+      <div class="meta">THC ${p.thcContent || '—'}${p.quantityAvailable != null ? ` &nbsp;•&nbsp; ${p.quantityAvailable} in stock` : ''}</div>
+      ${low ? `<div class="low">Only ${p.quantityAvailable} left</div>` : ''}
+      <div class="row"><span class="price">${money(p.price)}</span>
+        <span class="qty">
+          <button ${q === 0 ? 'disabled' : ''} onclick="changeQty('${p.id}',-1)">−</button>
+          <b>${q}</b>
+          <button ${q >= (p.quantityAvailable ?? 99) ? 'disabled' : ''} onclick="changeQty('${p.id}',1)">+</button>
+        </span>
+      </div>
+      <button class="add ${q > 0 ? 'added' : ''}" onclick="changeQty('${p.id}',1)">${q > 0 ? 'Added ✓ — tap to add more' : 'Add to reservation'}</button>
+    </div>`;
+  }).join('') || '<p style="color:var(--muted)">No items in this category right now.</p>';
+  updateBar();
+}
+
+window.changeQty = (id, d) => {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const cur = cart[id] || 0;
+  const next = Math.max(0, Math.min(p.quantityAvailable ?? 99, cur + d));
+  if (next === 0) delete cart[id]; else cart[id] = next;
+  renderGrid();
+};
+
+function cartLines() {
+  return Object.entries(cart).map(([id, qty]) => {
+    const p = products.find(x => x.id === id);
+    return p ? { ...p, qty, line: p.price * qty } : null;
+  }).filter(Boolean);
+}
+function cartTotal() { return cartLines().reduce((s, l) => s + l.line, 0); }
+
+function updateBar() {
+  const lines = cartLines();
+  const bar = document.getElementById('cartbar');
+  if (!lines.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  document.getElementById('cartCount').textContent = lines.reduce((s, l) => s + l.qty, 0) + (lines.reduce((s, l) => s + l.qty, 0) === 1 ? ' item' : ' items');
+  document.getElementById('cartTotal').textContent = money(cartTotal());
+}
+
+function openSheet(html) { document.getElementById('sheetPanel').innerHTML = html; document.getElementById('sheet').classList.add('open'); }
+function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
+document.getElementById('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+
+document.getElementById('reviewBtn').onclick = () => {
+  const lines = cartLines();
+  openSheet(`
+    <h2>Your reservation</h2>
+    <div class="sub">Pickup at Pittsburgh Dispensary. No payment online — pay in store.</div>
+    ${lines.map(l => `<div class="line-item"><span class="nm">${l.qty} × ${l.name}</span><span class="pr">${money(l.line)}</span></div>`).join('')}
+    <div class="total"><span>Total due at pickup</span><span>${money(cartTotal())}</span></div>
+    <label for="custName">Your full name</label>
+    <input id="custName" type="text" autocomplete="name" placeholder="Name on your ID">
+    <label>How will you verify at pickup?</label>
+    <div class="radio-row">
+      <label id="lblAdult" class="sel"><input type="radio" name="vtype" value="ADULT_USE_21" checked> 21+ government ID</label>
+      <label id="lblMed"><input type="radio" name="vtype" value="MEDICAL_CARD"> PA medical card</label>
+    </div>
+    <div id="adultFields">
+      <label for="idNumber">Government ID number</label>
+      <input id="idNumber" type="text" autocomplete="off" placeholder="Driver's license / state ID number">
+    </div>
+    <div id="medFields" style="display:none;">
+      <label for="mmjCard">PA medical marijuana card number</label>
+      <input id="mmjCard" type="text" autocomplete="off" placeholder="Card number">
+      <label for="cardExp">Card expiration date</label>
+      <input id="cardExp" type="date">
+    </div>
+    <div class="err" id="formErr"></div>
+    <button class="primary" id="submitRes">Reserve for pickup — ${money(cartTotal())}</button>
+    <button class="ghost" onclick="closeSheet()">Keep browsing</button>
+  `);
+  document.querySelectorAll('input[name="vtype"]').forEach(r => r.onchange = () => {
+    const med = document.querySelector('input[name="vtype"]:checked').value === 'MEDICAL_CARD';
+    document.getElementById('lblAdult').classList.toggle('sel', !med);
+    document.getElementById('lblMed').classList.toggle('sel', med);
+    document.getElementById('adultFields').style.display = med ? 'none' : 'block';
+    document.getElementById('medFields').style.display = med ? 'block' : 'none';
+  });
+  document.getElementById('submitRes').onclick = submitReservation;
+};
+
+async function submitReservation() {
+  const err = document.getElementById('formErr');
+  err.style.display = 'none';
+  const name = document.getElementById('custName').value.trim();
+  const vtype = document.querySelector('input[name="vtype"]:checked').value;
+  const payload = {
+    customerName: name,
+    verificationType: vtype,
+    items: cartLines().map(l => ({ id: l.id, quantity: l.qty })),
+    totalAmount: cartTotal()
+  };
+  if (!name) { err.textContent = 'Please enter the name on your ID.'; err.style.display = 'block'; return; }
+  if (vtype === 'MEDICAL_CARD') {
+    payload.mmjCardNumber = document.getElementById('mmjCard').value.trim();
+    payload.cardExpiration = document.getElementById('cardExp').value;
+    if (!payload.mmjCardNumber || !payload.cardExpiration) { err.textContent = 'Enter your PA medical card number and its expiration date.'; err.style.display = 'block'; return; }
+  } else {
+    payload.idNumber = document.getElementById('idNumber').value.trim();
+    if (!payload.idNumber) { err.textContent = 'Enter your government ID number.'; err.style.display = 'block'; return; }
+  }
+  const btn = document.getElementById('submitRes');
+  btn.disabled = true; btn.textContent = 'Reserving…';
+  try {
+    const res = await fetch(API + '/api/orders/reserve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Reservation failed.');
+    const orderId = data.posResult?.orderId || data.orderId || '—';
+    cart = {}; renderGrid();
+    openSheet(`<div class="ok">
+      <div class="big">✓</div>
+      <h2>Reserved for pickup</h2>
+      <p class="sub">Order <code>${orderId}</code></p>
+      <p>Bring your ${vtype === 'MEDICAL_CARD' ? 'PA medical marijuana card' : '21+ government ID'} to Pittsburgh Dispensary. Your items are on hold for pickup verification — total due in store: <b>${money(payload.totalAmount)}</b>.</p>
+      <button class="primary" onclick="closeSheet()">Done</button>
+    </div>`);
+  } catch (e) {
+    err.textContent = e.message; err.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Reserve for pickup — ' + money(cartTotal());
+  }
+}
+
+loadMenu();
+</script>
+</body>
+</html>

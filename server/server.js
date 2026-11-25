@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const posSyncMiddleware = require('./posSyncMiddleware');
 const { startInventoryCron, getCachedInventory } = require('./cronSync');
@@ -8,8 +9,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health Check Route for Render
-app.get('/', (req, res) => {
+// Storefront: the web menu + pickup reservation page lives in public/
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API status (JSON health check — the storefront now lives at /)
+app.get('/api/status', (req, res) => {
   res.status(200).json({ status: 'online', service: 'Pittsburgh Dispensary Local POS API' });
 });
 
